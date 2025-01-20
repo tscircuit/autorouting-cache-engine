@@ -1,0 +1,12 @@
+{
+  "name": "autorouting-cache-engine",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "bun-match-svg": "^0.0.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
