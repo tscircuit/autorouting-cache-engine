@@ -40,3 +40,126 @@ You can now use this `cacheKey` to see if you've already routed this subcircuit,
 and re-use the results!
 
 The `cacheKeyTransform` represents how you need to
+
+## Internals
+
+```mermaid
+flowchart TD
+    CJ[Circuit JSON] --> NAJ[Normalized Autorouting JSON]
+    NAJ --> |MD5 Hash| CK[Cache Key]
+    NAJ --> |Store Transform| TF[Transform Functions]
+
+    subgraph "Cache Key Generation"
+        NAJ
+        CK
+        TF
+    end
+
+    subgraph "Cache Usage"
+        CK --> |Cache Lookup| CR{Cache Result}
+        CR -->|Hit| CT[Cached Traces]
+        CR -->|Miss| AR[Autoroute]
+
+        CT --> TFR[Transform From Cache Space]
+        AR --> TTC[Transform To Cache Space]
+
+        TTC --> |Store| Cache[(Cache)]
+        TTC --> TFR
+
+        TFR --> FT[Final Traces]
+    end
+
+```
+
+### `NormalizedAutoroutingJson`
+
+To generate a cache key, we first generate a `NormalizedAutoroutingJson`. A
+`NormalizedAutoroutingJson` is a JSON object that contains a version of all
+the obstacles/traces that has rounded numbers. Serializing two different circuits
+that have the same autorouting result should have the same `NormalizedAutoroutingJson`
+
+Here's an example `NormalizedAutoroutingJson`:
+
+```json
+{
+  "allowed_layers": 2,
+  "nets_to_route": [1],
+  "sorted_normalized_objects": [
+    {
+      "net": 1,
+      "x": "0.00",
+      "y": "0.00",
+      "layers": [1],
+      "width": "0.25",
+      "height": "0.25"
+    },
+    {
+      "type": "rect",
+      "x": "3.00",
+      "y": "3.00",
+      "width": "1.00",
+      "height": "2.00",
+      "net": null
+    },
+    {
+      "net": 1,
+      "x": "6.00",
+      "y": "6.00",
+      "layers": [1],
+      "width": "0.25",
+      "height": "0.25"
+    }
+  ],
+  "sorted_normalized_traces": []
+}
+```
+
+There are rules to make sure that `NormalizedAutoroutingJson` is always the
+same for the same autorouting problem, these are the rules:
+
+- Traces and obstacles are converted into `sorted_normalized_objects`
+- All `mm` units are converted into strings with 2 decimal points
+- All objects are sorted by `layers`, `x`, `y`, `width`, `height` in that order (asc)
+- All connectivity nets (traces, nets etc.) are converted into a `net` number
+  - The `net` numbers increment by their order in `sorted_normalized_objects`
+  - If an object is in the same net as a previous object, use the previous `net`
+    number
+- Obstacles that are not connected to any trace should be given `"net": null`
+- `nets_to_route` is a sorted array of integers indicating the nets to route
+- `allowed_layers` indicates the layers that the autorouting is allowed to use
+  for the solution
+
+### `LongString`
+
+The `LongString` is a predictable JSON serialization to ensure that the
+`NormalizedAutoroutingJson` is always turned into the same string.
+
+To do predictable serialization, we mandate the following rules:
+
+- All keys must be sorted when serializing
+- No whitespace is allowed
+
+You can use the [json-stringify-deterministic](https://www.npmjs.com/package/json-stringify-deterministic) library to create a `LongString` from `NormalizedAutoroutingJson`
+
+```tsx
+import deterministicStringify from "json-stringify-deterministic"
+
+deterministicStringify(normalizedAutoroutingJson)
+// { "nets_to_route": [ ....
+```
+
+### `CacheKey1`
+
+The `CacheKey1` is an md5-encoded hash of the `LongString`. It can be used to
+see if this autorouting problem has ever previously been solved against a cache.
+
+md5 was selected for it's speed and popularity for checksums. There is not a
+major security risk since this is used for caching, not password security.
+
+```tsx
+import { createHash } from "crypto"
+
+const longString = deterministicStringify(normalizedAutoroutingJson)
+const cacheKey1 = createHash("md5").update(longString).digest("hex")
+// "5d41402abc4b2a76b9719d911017c592"
+```
