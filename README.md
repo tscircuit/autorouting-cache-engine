@@ -39,18 +39,21 @@ if (!cachedTraces) {
 You can now use this `cacheKey` to see if you've already routed this subcircuit,
 and re-use the results!
 
-The `cacheKeyTransform` represents how you need to
+The `cacheKeyTransform` represents how you need to transform the cached traces
+to or from the cache space (the normalized space)
 
-## Internals
+## Visual Overview
 
 ```mermaid
 flowchart TD
     CJ[Circuit JSON] --> NAJ[Normalized Autorouting JSON]
-    NAJ --> |MD5 Hash| CK[Cache Key]
+    NAJ --> |Deterministic JSON Stringify| LS[Long String]
+    LS --> |MD5 Hash| CK[Cache Key]
     NAJ --> |Store Transform| TF[Transform Functions]
 
     subgraph "Cache Key Generation"
         NAJ
+        LS
         CK
         TF
     end
@@ -68,8 +71,9 @@ flowchart TD
 
         TFR --> FT[Final Traces]
     end
-
 ```
+
+## Internals
 
 ### `NormalizedAutoroutingJson`
 
