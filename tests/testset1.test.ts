@@ -14,7 +14,7 @@ test("testset1", () => {
 {
   "allowed_layers": 1,
   "nets_to_route": [
-    3,
+    1,
   ],
   "sorted_normalized_objects": [
     {
@@ -22,7 +22,7 @@ test("testset1", () => {
       "layers": [
         "top",
       ],
-      "net": 2,
+      "net": null,
       "type": "pad",
       "width": "0.60",
       "x": "-2.00",
@@ -33,7 +33,7 @@ test("testset1", () => {
       "layers": [
         "top",
       ],
-      "net": 3,
+      "net": 1,
       "type": "pad",
       "width": "0.60",
       "x": "-3.00",
@@ -44,7 +44,7 @@ test("testset1", () => {
       "layers": [
         "top",
       ],
-      "net": 3,
+      "net": 1,
       "type": "pad",
       "width": "0.60",
       "x": "3.00",
@@ -55,32 +55,11 @@ test("testset1", () => {
       "layers": [
         "top",
       ],
-      "net": 1,
+      "net": null,
       "type": "pad",
       "width": "0.60",
       "x": "4.00",
       "y": "0.00",
-    },
-  ],
-  "sorted_normalized_traces": [
-    {
-      "net": 3,
-      "route": [
-        {
-          "layers": [
-            "top",
-          ],
-          "x": "3.00",
-          "y": "0.00",
-        },
-        {
-          "layers": [
-            "top",
-          ],
-          "x": "-3.00",
-          "y": "0.00",
-        },
-      ],
     },
   ],
 }

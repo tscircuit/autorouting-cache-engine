@@ -113,8 +113,7 @@ Here's an example `NormalizedAutoroutingJson`:
       "width": "0.25",
       "height": "0.25"
     }
-  ],
-  "sorted_normalized_traces": []
+  ]
 }
 ```
 
