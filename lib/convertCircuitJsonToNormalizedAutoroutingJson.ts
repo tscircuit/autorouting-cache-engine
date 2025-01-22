@@ -1,40 +1,11 @@
 import type { CircuitJson } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { getBoundsOfRegionOfInterest } from "./getBoundsOfRegionOfInterest"
-
-export type NormalizedAutoroutingJson = {
-  allowed_layers: number
-  nets_to_route: number[]
-  sorted_normalized_objects: Array<{
-    net: number | null
-    x: string
-    y: string
-    layers: string[]
-    width?: string
-    height?: string
-    radius?: string
-    type?: "pad" | "hole"
-  }>
-}
-
-export type NormalizationTransform = {
-  offsetX: number
-  offsetY: number
-  netInfo: Record<
-    number,
-    {
-      sourceTraceIds: string[]
-      sourceNetIds: string[]
-    }
-  >
-}
+import type { NormalizationOptions } from "./types"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
-  options: {
-    subcircuit_id?: string
-    marginOutsideOfRegionOfInterest?: number
-  } = {},
+  options: NormalizationOptions = {},
 ): {
   normalizedAutoroutingJson: NormalizedAutoroutingJson
   normalizationTransform: NormalizationTransform

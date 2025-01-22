@@ -15,6 +15,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "circuit-json-to-connectivity-map": "^0.0.18"
+    "circuit-json-to-connectivity-map": "^0.0.18",
+    "json-stringify-deterministic": "^1.0.12"
   }
 }
