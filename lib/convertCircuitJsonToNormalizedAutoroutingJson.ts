@@ -17,6 +17,13 @@ export type NormalizedAutoroutingJson = {
   }>
 }
 
+export type CacheSpaceTransform = {
+  offsetX: number
+  offsetY: number
+  // TODO add information to map NormalizedAutoroutingJson to CircuitJson
+  // e.g. the mapping of nets to source_traces
+}
+
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
   options: {
@@ -25,12 +32,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   } = {},
 ): {
   normalizedAutoroutingJson: NormalizedAutoroutingJson
-  cacheSpaceTransform: {
-    offsetX: number
-    offsetY: number
-    // TODO add information to map NormalizedAutoroutingJson to CircuitJson
-    // e.g. the mapping of nets to source_traces
-  }
+  cacheSpaceTransform: CacheSpaceTransform
 } => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
 
@@ -151,5 +153,9 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 
   return {
     normalizedAutoroutingJson,
+    cacheSpaceTransform: {
+      offsetX,
+      offsetY,
+    },
   }
 }
