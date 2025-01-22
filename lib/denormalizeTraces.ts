@@ -68,6 +68,7 @@ export const denormalizeTraces = ({
 
     const denormalizedTrace: PcbTrace = {
       type: "pcb_trace",
+      source_trace_id: sourceTrace?.source_trace_id,
       pcb_trace_id: `pcb_trace_${++highestPcbTraceIdNumber}`,
       route: denormalizedRoute,
     }
