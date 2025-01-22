@@ -4,7 +4,7 @@ import circuit1 from "./assets/testset1/circuit1.json"
 import circuit2 from "./assets/testset1/circuit2.json"
 import { convertCircuitJsonToNormalizedAutoroutingJson } from "../lib/convertCircuitJsonToNormalizedAutoroutingJson"
 
-test("testset1", () => {
+test("testset1 should be equal despite translation", () => {
   const { normalizedAutoroutingJson: normalizedAutoroutingJson1 } =
     convertCircuitJsonToNormalizedAutoroutingJson(circuit1 as any)
   const { normalizedAutoroutingJson: normalizedAutoroutingJson2 } =
