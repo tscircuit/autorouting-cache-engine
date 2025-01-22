@@ -1,7 +1,12 @@
 {
   "name": "@tscircuit/autorouting-cache-engine",
+  "version": "0.0.1",
+  "repository": "https://github.com/tscircuit/autorouting-cache-engine",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "build": "tsup-node ./lib/index.ts --dts --format esm --sourcemap"
+  },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@tscircuit/core": "^0.0.274",
@@ -9,7 +14,8 @@
     "@tscircuit/soup-util": "^0.0.41",
     "@types/bun": "latest",
     "bun-match-svg": "^0.0.9",
-    "circuit-json": "^0.0.131"
+    "circuit-json": "^0.0.131",
+    "tsup": "^8.3.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
