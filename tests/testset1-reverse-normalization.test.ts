@@ -16,8 +16,8 @@ test("testset1 should be able to apply cached traces to circuit1 and have it mat
 
   console.log(cacheRes1)
 
-  const cacheSpaceTraces = normalizePcbTraces({
-    cacheSpaceTransform: cacheRes2.cacheSpaceTransform,
+  const normalizedTraces = normalizePcbTraces({
+    normalizationTransform: cacheRes2.normalizationTransform,
     circuitJson: circuit2 as any,
     pcbTraceIds: circuit2
       .filter((el) => el.type === "pcb_trace")
@@ -25,9 +25,9 @@ test("testset1 should be able to apply cached traces to circuit1 and have it mat
   })
 
   const circuit1SpaceTraces = denormalizeTraces({
-    cacheSpaceTransform: cacheRes1.cacheSpaceTransform,
+    normalizationTransform: cacheRes1.normalizationTransform,
     circuitJson: circuit1.filter((el) => el.type !== "pcb_trace") as any,
-    cacheSpaceTraces,
+    normalizedTraces,
   })
 
   expect(

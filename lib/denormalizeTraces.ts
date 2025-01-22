@@ -1,17 +1,18 @@
 import type { CircuitJson, PcbTrace } from "circuit-json"
-import type { CacheSpaceTransform } from "./convertCircuitJsonToNormalizedAutoroutingJson"
+import type { NormalizationTransform } from "./convertCircuitJsonToNormalizedAutoroutingJson"
 import type { NormalizedAutoroutingTrace } from "./NormalizedAutoroutingTrace"
 
 export const denormalizeTraces = ({
-  cacheSpaceTransform,
+  normalizationTransform,
   circuitJson,
   normalizedTraces,
 }: {
-  cacheSpaceTransform: CacheSpaceTransform
+  normalizationTransform: NormalizationTransform
   circuitJson: CircuitJson
   normalizedTraces: NormalizedAutoroutingTrace[]
 }): PcbTrace[] => {
-  const { offsetX: targetOffsetX, offsetY: targetOffsetY } = cacheSpaceTransform
+  const { offsetX: targetOffsetX, offsetY: targetOffsetY } =
+    normalizationTransform
   const sourceOffsetX = 0 // Cache space is always centered at 0,0
   const sourceOffsetY = 0
 

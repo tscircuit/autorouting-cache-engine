@@ -40,7 +40,7 @@ You can now use this `cacheKey` to see if you've already routed this subcircuit,
 and re-use the results!
 
 The `cacheKeyTransform` represents how you need to transform the cached traces
-to or from the cache space (the normalized space)
+to or from the normalized space
 
 ## Visual Overview
 
@@ -63,8 +63,8 @@ flowchart TD
         CR -->|Hit| CT[Cached Traces]
         CR -->|Miss| AR[Autoroute]
 
-        CT --> TFR[Transform From Cache Space]
-        AR --> TTC[Transform To Cache Space]
+        CT --> TFR[Transform From Normalized Space]
+        AR --> TTC[Transform To Normalized Space]
 
         TTC --> |Store| Cache[(Cache)]
         TTC --> TFR

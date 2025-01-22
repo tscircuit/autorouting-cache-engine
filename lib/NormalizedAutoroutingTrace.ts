@@ -10,9 +10,11 @@ interface NormalizedRoutePoint {
 }
 
 /**
- * Cache-space traces are traces that have been transformed to the cache space
+ * Normalized-space traces are traces that have been transformed to the
+ * normalized space, the X/Y coordinates are relative to the "Region of Interest"
+ * and they reference net numbers instead of source traces and source nets.
  *
- * They cannot be used with Circuit JSON until you reverse the cache space
+ * They cannot be used with Circuit JSON until you reverse the normalized space
  * transform on them.
  *
  * They different from pcb_traces in that they use the net numbers from the
