@@ -1,10 +1,10 @@
 import type { PcbTrace, PcbTraceRoutePoint } from "circuit-json"
 
-interface NormalizedRoutePoint {
+export interface NormalizedRoutePoint {
   route_type: "wire" | "via"
   x: number
   y: number
-  width: number
+  width?: number
   from_layer?: number
   to_layer?: number
   layer?: number
