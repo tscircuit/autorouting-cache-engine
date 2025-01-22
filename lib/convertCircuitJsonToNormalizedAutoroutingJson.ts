@@ -19,6 +19,10 @@ type NormalizedAutoroutingJson = {
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
+  options: {
+    subcircuit_id?: string
+    marginOutsideOfRegionOfInterest?: number
+  } = {},
 ): NormalizedAutoroutingJson => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
 

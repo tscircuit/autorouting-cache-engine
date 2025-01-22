@@ -132,6 +132,10 @@ same for the same autorouting problem, these are the rules:
 - `allowed_layers` indicates the layers that the autorouting is allowed to use
   for the solution
 - The normalized objects are translated to be centered about the "region of interest" which is the smallest bounding box that contains all the nets to connect
+- When creating NormalizedAutoroutingJson, you can specify a `marginOutsideOfRegionOfInterest` which indicates how far outside the region of
+  interest to include obstacles. If an obstacle is outside the region of interest
+  plus the `marginOutsideOfRegionOfInterest`, it will be ignored (it will not
+  be included in the `NormalizedAutoroutingJson`)
 
 ### `LongString`
 
