@@ -1,5 +1,5 @@
 {
-  "name": "autorouting-cache-engine",
+  "name": "@tscircuit/autorouting-cache-engine",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
