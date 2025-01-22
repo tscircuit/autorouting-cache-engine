@@ -79,7 +79,7 @@ flowchart TD
 
 To generate a cache key, we first generate a `NormalizedAutoroutingJson`. A
 `NormalizedAutoroutingJson` is a JSON object that contains a version of all
-the obstacles/traces that has rounded numbers. Serializing two different circuits
+the obstacles/traces with rounded numbers. Serializing two different circuits
 that have the same autorouting result should have the same `NormalizedAutoroutingJson`
 
 Here's an example `NormalizedAutoroutingJson`:
@@ -131,6 +131,7 @@ same for the same autorouting problem, these are the rules:
 - `nets_to_route` is a sorted array of integers indicating the nets to route
 - `allowed_layers` indicates the layers that the autorouting is allowed to use
   for the solution
+- The normalized objects are translated to be centered about the "region of interest" which is the smallest bounding box that contains all the nets to connect
 
 ### `LongString`
 
