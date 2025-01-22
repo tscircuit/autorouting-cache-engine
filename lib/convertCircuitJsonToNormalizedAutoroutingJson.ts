@@ -1,7 +1,11 @@
 import type { CircuitJson } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { getBoundsOfRegionOfInterest } from "./getBoundsOfRegionOfInterest"
-import type { NormalizationOptions } from "./types"
+import type {
+  NormalizationOptions,
+  NormalizedAutoroutingJson,
+  NormalizationTransform,
+} from "./types"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -25,7 +29,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   // Collect obstacles with translated positions
   const obstacles = circuitJson
     .filter((el) => el.type === "pcb_smtpad" || el.type === "pcb_plated_hole")
-    .map((el) => {
+    .map((el: any) => {
       const base = {
         x: (el.x - offsetX).toFixed(2),
         y: (el.y - offsetY).toFixed(2),
@@ -56,9 +60,9 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   // Collect traces to route
   const traces = circuitJson
     .filter((el) => el.type === "source_trace")
-    .map((trace) => {
+    .map((trace: any) => {
       const connNet = connectivityMap.getNetConnectedToId(trace.source_trace_id)
-      const ports = trace.connected_source_port_ids.flatMap((portId) =>
+      const ports = trace.connected_source_port_ids.flatMap((portId: string) =>
         circuitJson.filter(
           (el) => el.type === "pcb_port" && el.source_port_id === portId,
         ),
@@ -66,7 +70,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 
       return {
         net: connNet,
-        route: ports.map((port) => ({
+        route: ports.map((port: any) => ({
           x: (port.x - offsetX).toFixed(2),
           y: (port.y - offsetY).toFixed(2),
           layers: port.layers,
@@ -75,7 +79,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     })
 
   // Sort objects by layers, x, y, width, height
-  const sortedObstacles = [...obstacles].sort((a, b) => {
+  const sortedObstacles = [...obstacles].sort((a: any, b: any) => {
     const layerCompare = a.layers.join().localeCompare(b.layers.join())
     if (layerCompare !== 0) return layerCompare
     if (a.x !== b.x) return a.x.localeCompare(b.x)
@@ -89,14 +93,14 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 
   // Only include nets that are being routed (have traces)
   const routedNets = new Set(
-    traces.map((t) => t.net).filter((n) => n !== null),
+    traces.map((t: any) => t.net).filter((n: any) => n !== null),
   ) as Set<string>
 
   // Process nets in sort order from obstacles then traces, but only those being routed
   const allConnNetNamesInOrder = [
     ...sortedObstacles
       .map((o) => o.net)
-      .filter((n) => n !== null && routedNets.has(n)),
+      .filter((n: any) => n !== null && routedNets.has(n)),
     ...traces.map((t) => t.net).filter((n) => n !== null),
   ] as string[]
 
@@ -137,7 +141,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   for (const el of circuitJson) {
     if (el.type === "source_trace") {
       const connNet = connectivityMap.getNetConnectedToId(el.source_trace_id)
-      const netNumber = connNetToNetNumber.get(connNet)
+      const netNumber = connNetToNetNumber.get(connNet!)
 
       if (!netNumber) continue
 

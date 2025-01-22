@@ -4,8 +4,10 @@ import type {
   PcbTrace,
   PcbTraceRoutePoint,
 } from "circuit-json"
-import type { NormalizationTransform } from "./convertCircuitJsonToNormalizedAutoroutingJson"
-import type { NormalizedAutoroutingTrace } from "./NormalizedAutoroutingTrace"
+import type {
+  NormalizationTransform,
+  NormalizedAutoroutingTrace,
+} from "./types"
 import { LAYER_NAME_TO_NUMBER, LAYER_NUMBER_TO_NAME } from "./constants"
 import { su } from "@tscircuit/soup-util"
 import { addPcbPortIdsToTraces } from "./addPcbPortIdsToTraces"

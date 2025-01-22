@@ -1,9 +1,9 @@
 import type { CircuitJson, PcbTrace } from "circuit-json"
-import type { NormalizationTransform } from "./convertCircuitJsonToNormalizedAutoroutingJson"
 import type {
+  NormalizationTransform,
   NormalizedAutoroutingTrace,
   NormalizedRoutePoint,
-} from "./NormalizedAutoroutingTrace"
+} from "./types"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { LAYER_NAME_TO_NUMBER } from "./constants"
 
@@ -35,7 +35,7 @@ export const normalizePcbTraces = ({
 
     // Find normalized net number that contains this source trace ID
     const netEntry = Object.entries(normalizationTransform.netInfo).find(
-      ([_, info]) => info.sourceTraceIds.includes(sourceTraceId!),
+      ([_, info]: any) => info.sourceTraceIds.includes(sourceTraceId!),
     )
     if (!netEntry) continue
 

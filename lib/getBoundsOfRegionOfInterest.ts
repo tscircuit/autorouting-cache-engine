@@ -20,7 +20,7 @@ export const getBoundsOfRegionOfInterest = (
         ),
       ),
     )
-    .map((port) => ({ x: port.x, y: port.y }))
+    .map((port: any) => ({ x: port.x, y: port.y }))
 
   // Calculate bounds
   const minX = Math.min(...allPoints.map((p) => p.x))
