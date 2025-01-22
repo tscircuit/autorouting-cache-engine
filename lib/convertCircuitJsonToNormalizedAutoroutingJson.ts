@@ -1,5 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
+import { getBoundsOfRegionOfInterest } from "./getBoundsOfRegionOfInterest"
 
 type NormalizedAutoroutingJson = {
   allowed_layers: number
@@ -21,37 +22,15 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 ): NormalizedAutoroutingJson => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
 
-  // First pass - collect all positions from routed nets
-  const tempTraces = circuitJson
-    .filter((el) => el.type === "source_trace")
-    .map((trace) => {
-      const net = connectivityMap.getNetConnectedToId(trace.source_trace_id)
-      const ports = trace.connected_source_port_ids.flatMap((portId) =>
-        circuitJson.filter(
-          (el) => el.type === "pcb_port" && el.source_port_id === portId,
-        ),
-      )
-
-      return {
-        net,
-        route: ports.map((port) => ({
-          x: port.x,
-          y: port.y,
-          layers: port.layers,
-        })),
-      }
-    })
-
-  // Get bounds of routed nets
-  const allPoints = tempTraces.flatMap((t) =>
-    t.route.map((p) => ({ x: p.x, y: p.y })),
-  )
-  const minX = Math.min(...allPoints.map((p) => p.x))
-  const maxX = Math.max(...allPoints.map((p) => p.x))
-  const minY = Math.min(...allPoints.map((p) => p.y))
-  const maxY = Math.max(...allPoints.map((p) => p.y))
-  const offsetX = (minX + maxX) / 2
-  const offsetY = (minY + maxY) / 2
+  // Get bounds and calculate offsets
+  const {
+    minX,
+    maxX,
+    minY,
+    maxY,
+    centerX: offsetX,
+    centerY: offsetY,
+  } = getBoundsOfRegionOfInterest(circuitJson)
 
   // Collect obstacles with translated positions
   const obstacles = circuitJson
