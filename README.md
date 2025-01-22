@@ -3,32 +3,40 @@
 Generate a cache key(s) to enable re-using previous autorouting results.
 
 ```tsx
-import { generateAutoroutingCacheKey } from "@tscircuit-internal/autorouting-cache-engine"
+import { generateCacheKey, normalizePcbTraces, denormalizeTraces } from "@tscircuit-internal/autorouting-cache-engine"
 import circuitJson from "./circuit.json"
 
-const { cacheKey, transformTracesToCacheSpace, transformTracesFromCacheSpace } =
-  generateAutoroutingCacheKey(circuitJson, {
-    subcircuit_id: "...",
-  })
+// Generate cache key and get normalization transform
+const { cacheKey, normalizationTransform } = generateCacheKey(circuitJson)
 
-console.log(cacheKey)
+console.log(cacheKey) 
 // 938c2cc0dcc05f2b68c4287040cfcf71
 
 // ------------- USAGE WITH CACHE -------------------
-
 import myCachedTraces from "./cached-traces"
 
 const cachedTraces = myCachedTraces.get(cacheKey)
 
 if (!cachedTraces) {
+  // Route and store normalized traces
   const newlyRoutedTraces = autoroute(circuitJson)
-  const cacheSpaceTraces = transformTracesToCacheSpace(newlyRoutedTraces)
-  myCachedTraces.set(cacheKey, cacheSpaceTraces)
-
+  
+  // Normalize traces for caching
+  const normalizedTraces = normalizePcbTraces({
+    normalizationTransform,
+    circuitJson,
+    pcbTraceIds: newlyRoutedTraces.map(t => t.pcb_trace_id!)
+  })
+  
+  myCachedTraces.set(cacheKey, normalizedTraces)
   const circuitJsonWithTraces = circuitJson.concat(newlyRoutedTraces)
-} else (cachedTraces) {
-  // We found the traces in the cache! Let's use them!
-  const traces = transformTracesFromCacheSpace(cachedTraces)
+} else {
+  // Denormalize cached traces back to original space
+  const traces = denormalizeTraces({
+    normalizationTransform,
+    circuitJson,
+    normalizedTraces: cachedTraces
+  })
 
   const circuitJsonWithTraces = circuitJson.concat(traces)
 }
