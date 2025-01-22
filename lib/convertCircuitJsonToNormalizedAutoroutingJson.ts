@@ -2,7 +2,7 @@ import type { CircuitJson } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { getBoundsOfRegionOfInterest } from "./getBoundsOfRegionOfInterest"
 
-type NormalizedAutoroutingJson = {
+export type NormalizedAutoroutingJson = {
   allowed_layers: number
   nets_to_route: number[]
   sorted_normalized_objects: Array<{
@@ -23,7 +23,12 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     subcircuit_id?: string
     marginOutsideOfRegionOfInterest?: number
   } = {},
-): NormalizedAutoroutingJson => {
+): {
+  normalizedAutoroutingJson: NormalizedAutoroutingJson
+  offsetX: number
+  offsetY: number
+  // TODO add information to map NormalizedAutoroutingJson to CircuitJson
+} => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
 
   // Get bounds and calculate offsets
@@ -135,9 +140,13 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     ),
   ).sort()
 
-  return {
+  const normalizedAutoroutingJson: NormalizedAutoroutingJson = {
     allowed_layers: 1,
     nets_to_route: netsToRoute,
     sorted_normalized_objects: normalizedObstacles,
+  }
+
+  return {
+    normalizedAutoroutingJson,
   }
 }
