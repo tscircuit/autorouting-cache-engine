@@ -11,20 +11,7 @@ export const normalizePcbTraces = ({
   circuitJson: CircuitJson
   pcbTraceIds: string[]
 }): NormalizedAutoroutingTrace[] => {
-  const { offsetX: sourceOffsetX, offsetY: sourceOffsetY } =
-    normalizationTransform
-
-  return circuitJson
-    .filter(
-      (el): el is PcbTrace =>
-        el.type === "pcb_trace" && pcbTraceIds.includes(el.pcb_trace_id),
-    )
-    .map((trace) => ({
-      ...trace,
-      route: trace.route.map((routePoint) => ({
-        ...routePoint,
-        x: routePoint.x - sourceOffsetX,
-        y: routePoint.y - sourceOffsetY,
-      })),
-    }))
+  const normalizedTraces: NormalizedAutoroutingTrace[] = []
+  // TODO implement
+  return normalizedTraces
 }

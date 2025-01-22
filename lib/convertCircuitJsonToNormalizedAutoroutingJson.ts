@@ -86,7 +86,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   const traces = circuitJson
     .filter((el) => el.type === "source_trace")
     .map((trace) => {
-      const net = connectivityMap.getNetConnectedToId(trace.source_trace_id)
+      const connNet = connectivityMap.getNetConnectedToId(trace.source_trace_id)
       const ports = trace.connected_source_port_ids.flatMap((portId) =>
         circuitJson.filter(
           (el) => el.type === "pcb_port" && el.source_port_id === portId,
@@ -94,7 +94,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
       )
 
       return {
-        net,
+        net: connNet,
         route: ports.map((port) => ({
           x: (port.x - offsetX).toFixed(2),
           y: (port.y - offsetY).toFixed(2),
@@ -113,7 +113,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   })
 
   // Convert net IDs to numeric indices based on first occurrence in sorted obstacles
-  const netToIndex = new Map<string, number>()
+  const connNetToNetNumber = new Map<string, number>()
   let netCounter = 1
 
   // Only include nets that are being routed (have traces)
@@ -122,23 +122,23 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   ) as Set<string>
 
   // Process nets in sort order from obstacles then traces, but only those being routed
-  const allNets = [
+  const allConnNetNamesInOrder = [
     ...sortedObstacles
       .map((o) => o.net)
       .filter((n) => n !== null && routedNets.has(n)),
     ...traces.map((t) => t.net).filter((n) => n !== null),
   ] as string[]
 
-  for (const net of allNets) {
-    if (!netToIndex.has(net)) {
-      netToIndex.set(net, netCounter++)
+  for (const connNetName of allConnNetNamesInOrder) {
+    if (!connNetToNetNumber.has(connNetName)) {
+      connNetToNetNumber.set(connNetName, netCounter++)
     }
   }
 
   // Convert nets to numeric indices in obstacles and traces
   const normalizedObstacles = sortedObstacles.map((o) => ({
     ...o,
-    net: o.net ? (netToIndex.get(o.net) ?? null) : null,
+    net: o.net ? (connNetToNetNumber.get(o.net) ?? null) : null,
   }))
 
   // Get unique numeric nets to route
@@ -156,11 +156,42 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     sorted_normalized_objects: normalizedObstacles,
   }
 
+  // Build netInfo by collecting source trace and net information
+  const netInfo: Record<
+    number,
+    { sourceTraceIds: string[]; sourceNetIds: string[] }
+  > = {}
+
+  // Process all source traces to populate netInfo
+  for (const el of circuitJson) {
+    if (el.type === "source_trace") {
+      const connNet = connectivityMap.getNetConnectedToId(el.source_trace_id)
+      const netNumber = connNetToNetNumber.get(connNet)
+
+      if (!netNumber) continue
+
+      netInfo[netNumber] ??= {
+        sourceTraceIds: [],
+        sourceNetIds: [],
+      }
+      netInfo[netNumber].sourceTraceIds.push(el.source_trace_id)
+      netInfo[netNumber].sourceNetIds.push(
+        ...(el.connected_source_net_ids || []),
+      )
+    }
+  }
+
+  // Deduplicate sourceNetIds
+  for (const info of Object.values(netInfo)) {
+    info.sourceNetIds = [...new Set(info.sourceNetIds)]
+  }
+
   return {
     normalizedAutoroutingJson,
     normalizationTransform: {
       offsetX,
       offsetY,
+      netInfo,
     },
   }
 }

@@ -14,7 +14,7 @@ test("testset1 should be able to apply cached traces to circuit1 and have it mat
     circuit2 as any,
   )
 
-  console.log(cacheRes1)
+  console.log(cacheRes1.normalizationTransform)
 
   const normalizedTraces = normalizePcbTraces({
     normalizationTransform: cacheRes2.normalizationTransform,

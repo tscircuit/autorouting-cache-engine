@@ -5,8 +5,9 @@ interface NormalizedRoutePoint {
   x: number
   y: number
   width: number
-  from_layer?: string
-  to_layer?: string
+  from_layer?: number
+  to_layer?: number
+  layer?: number
 }
 
 /**
