@@ -1,8 +1,8 @@
 {
   "name": "@tscircuit/autorouting-cache-engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/tscircuit/autorouting-cache-engine",
-  "module": "index.ts",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsup-node ./lib/index.ts --dts --format esm --sourcemap"
