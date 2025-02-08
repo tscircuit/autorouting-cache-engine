@@ -7,7 +7,7 @@ import type {
   NormalizationTransform,
   NormalizedObject,
 } from "./types"
-import { getAncestorSubcircuitIds } from "./getAncestorSubcircuitIds"
+import { getAncestorSubcircuitIds } from "./circuit-json-utils/getAncestorSubcircuitIds"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -42,15 +42,32 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 
   // Collect obstacles with translated positions
   const obstacles = circuitJson
-    .filter((el) => el.type === "pcb_smtpad" || el.type === "pcb_plated_hole")
-    .map((el: any) => {
+    .filter(
+      (el) =>
+        el.type === "pcb_smtpad" ||
+        el.type === "pcb_plated_hole" ||
+        el.type === "pcb_trace",
+    )
+    .map((el: any): NormalizedObject => {
+      const net = connectivityMap.getNetConnectedToId(
+        el.pcb_port_id || el.pcb_plated_hole_id || el.pcb_trace_id,
+      ) as any
+
+      if (el.type === "pcb_trace") {
+        // The route segments and vias must be sorted
+        return {
+          net,
+          type: "trace" as const,
+          route_segments: getRouteSegmentsFromTrace(el),
+          vias: getViasFromTrace(el),
+        }
+      }
+
       const base = {
         x: (el.x - offsetX).toFixed(2),
         y: (el.y - offsetY).toFixed(2),
         layers: el.type === "pcb_smtpad" ? [el.layer] : el.layers,
-        net: connectivityMap.getNetConnectedToId(
-          el.pcb_port_id || el.pcb_plated_hole_id,
-        ),
+        net,
       }
 
       if (el.type === "pcb_smtpad") {

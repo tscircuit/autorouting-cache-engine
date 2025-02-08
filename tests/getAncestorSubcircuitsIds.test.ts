@@ -1,4 +1,4 @@
-import { getAncestorSubcircuitIds } from "../lib/getAncestorSubcircuitIds"
+import { getAncestorSubcircuitIds } from "../lib/circuit-json-utils/getAncestorSubcircuitIds"
 import { test, expect } from "bun:test"
 import circuit2 from "./assets/testset2/circuit2-has-routes.json"
 
