@@ -5,7 +5,11 @@ import type {
   NormalizationOptions,
   NormalizedAutoroutingJson,
   NormalizationTransform,
+  NormalizedObject,
 } from "./types"
+import { getAncestorSubcircuitIds } from "./circuit-json-utils/getAncestorSubcircuitIds"
+import { getRouteSegmentsFromTrace } from "./circuit-json-utils/getRouteSegmentsFromTrace"
+import { getViasFromTrace } from "./circuit-json-utils/getViasFromTrace"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -15,8 +19,22 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   normalizationTransform: NormalizationTransform
 } => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
+  if (options.subcircuitId) {
+    const includedSubcircuitIds = [
+      options.subcircuitId,
+      ...getAncestorSubcircuitIds(circuitJson, options.subcircuitId),
+    ]
+
+    circuitJson = circuitJson.filter(
+      (el) =>
+        "subcircuit_id" in el &&
+        includedSubcircuitIds.includes(el.subcircuit_id!),
+    )
+  }
 
   // Get bounds and calculate offsets
+  const regionOfInterest = getBoundsOfRegionOfInterest(circuitJson)
+
   const {
     minX,
     maxX,
@@ -24,25 +42,48 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     maxY,
     centerX: offsetX,
     centerY: offsetY,
-  } = getBoundsOfRegionOfInterest(circuitJson)
+  } = regionOfInterest
 
   // Collect obstacles with translated positions
   const obstacles = circuitJson
-    .filter((el) => el.type === "pcb_smtpad" || el.type === "pcb_plated_hole")
-    .map((el: any) => {
+    .filter(
+      (el) =>
+        el.type === "pcb_smtpad" ||
+        el.type === "pcb_plated_hole" ||
+        el.type === "pcb_trace",
+    )
+    .map((el: any): NormalizedObject => {
+      const net = connectivityMap.getNetConnectedToId(
+        el.pcb_port_id || el.pcb_plated_hole_id || el.pcb_trace_id,
+      ) as any
+
+      if (el.type === "pcb_trace") {
+        // The route segments and vias must be sorted
+        return {
+          net,
+          type: "trace" as const,
+          route_segments: getRouteSegmentsFromTrace(el, {
+            offsetX,
+            offsetY,
+          }),
+          vias: getViasFromTrace(el, {
+            offsetX,
+            offsetY,
+          }),
+        }
+      }
+
       const base = {
         x: (el.x - offsetX).toFixed(2),
         y: (el.y - offsetY).toFixed(2),
         layers: el.type === "pcb_smtpad" ? [el.layer] : el.layers,
-        net: connectivityMap.getNetConnectedToId(
-          el.pcb_port_id || el.pcb_plated_hole_id,
-        ),
+        net,
       }
 
       if (el.type === "pcb_smtpad") {
         return {
           ...base,
-          type: "pad" as const,
+          type: "rect_pad" as const,
           width: (el.shape === "rect" ? el.width : el.radius * 2).toFixed(2),
           height: (el.shape === "rect" ? el.height : el.radius * 2).toFixed(2),
         }
@@ -79,16 +120,25 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     })
 
   // Sort objects by layers, x, y, width, height
-  const sortedObstacles = [...obstacles].sort((a: any, b: any) => {
-    const layerCompare = a.layers.join().localeCompare(b.layers.join())
-    if (layerCompare !== 0) return layerCompare
-    if (a.x !== b.x) return a.x.localeCompare(b.x)
-    if (a.y !== b.y) return a.y.localeCompare(b.y)
-    return (a.width || a.radius || "").localeCompare(b.width || b.radius || "")
-  })
+  const sortedObstacles: NormalizedObject[] = [...obstacles].sort(
+    (a: any, b: any) => {
+      if (a.type !== b.type) return a.type.localeCompare(b.type)
+      if (a.type === "trace" && b.type === "trace") {
+        // TODO trace sorting mechanism
+        return 0
+      }
+      const layerCompare = a.layers.join().localeCompare(b.layers.join())
+      if (layerCompare !== 0) return layerCompare
+      if (a.x !== b.x) return a.x.localeCompare(b.x)
+      if (a.y !== b.y) return a.y.localeCompare(b.y)
+      return (a.width || a.radius || "").localeCompare(
+        b.width || b.radius || "",
+      )
+    },
+  )
 
   // Convert net IDs to numeric indices based on first occurrence in sorted obstacles
-  const connNetToNetNumber = new Map<string, number>()
+  const connNetToNetNumber = new Map<string | number, number>()
   let netCounter = 1
 
   // Only include nets that are being routed (have traces)
