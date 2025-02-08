@@ -15,6 +15,12 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   normalizationTransform: NormalizationTransform
 } => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
+  if (options.subcircuitId) {
+    circuitJson = circuitJson.filter(
+      (el) =>
+        "subcircuit_id" in el && el.subcircuit_id === options.subcircuitId,
+    )
+  }
 
   // Get bounds and calculate offsets
   const {

@@ -24,19 +24,52 @@ export interface NormalizedAutoroutingTrace {
   route: NormalizedRoutePoint[]
 }
 
-export type NormalizedAutoroutingJson = {
-  allowed_layers: number
-  nets_to_route: number[]
-  sorted_normalized_objects: Array<{
-    net: number | null
+export interface NormalizedPad {
+  type: "rect_pad"
+  net: number | null
+  x: string
+  y: string
+  layers: string[]
+  width: string
+  height: string
+  radius: string
+}
+
+export interface NormalizedHole {
+  type: "hole"
+  net: number | null
+  x: string
+  y: string
+  layers: string[]
+  width?: string
+  height?: string
+  radius: string
+}
+
+export interface NormalizedTrace {
+  type: "trace"
+  net: number | null
+  route_segments: Array<{
+    x1: string
+    y1: string
+    x2: string
+    y2: string
+    layer: string
+  }>
+  vias: Array<{
     x: string
     y: string
     layers: string[]
-    width?: string
-    height?: string
-    radius?: string
-    type?: "pad" | "hole"
+    radius: string
   }>
+}
+
+export type NormalizedObject = NormalizedPad | NormalizedHole | NormalizedTrace
+
+export type NormalizedAutoroutingJson = {
+  allowed_layers: number
+  nets_to_route: number[]
+  sorted_normalized_objects: NormalizedObject[]
 }
 
 export type NormalizationTransform = {
