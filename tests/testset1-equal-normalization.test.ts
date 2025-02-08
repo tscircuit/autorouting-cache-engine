@@ -66,13 +66,6 @@ test("testset1 should be equal despite translation", () => {
           "route_segments": [
             {
               "layer": "top",
-              "x1": "3.00",
-              "x2": "-0.70",
-              "y1": "0.00",
-              "y2": "0.00",
-            },
-            {
-              "layer": "top",
               "x1": "-0.70",
               "x2": "-0.70",
               "y1": "0.00",
@@ -90,6 +83,13 @@ test("testset1 should be equal despite translation", () => {
               "x1": "-3.00",
               "x2": "-3.00",
               "y1": "1.30",
+              "y2": "0.00",
+            },
+            {
+              "layer": "top",
+              "x1": "3.00",
+              "x2": "-0.70",
+              "y1": "0.00",
               "y2": "0.00",
             },
           ],

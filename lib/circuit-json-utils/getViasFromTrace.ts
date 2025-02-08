@@ -20,5 +20,12 @@ export const getViasFromTrace = (
       })
     }
   }
+
+  vias.sort((a, b) =>
+    `${a.layers.join("/")},${a.x},${a.y}`.localeCompare(
+      `${b.layers.join("/")},${b.x},${b.y}`,
+    ),
+  )
+
   return vias
 }

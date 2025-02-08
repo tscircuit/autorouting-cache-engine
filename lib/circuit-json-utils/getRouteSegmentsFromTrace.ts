@@ -27,5 +27,12 @@ export const getRouteSegmentsFromTrace = (
       })
     }
   }
+
+  segments.sort((a, b) =>
+    `${a.layer},${a.x1},${a.y1},${a.x2},${a.y2}`.localeCompare(
+      `${b.layer},${b.x1},${b.y1},${b.x2},${b.y2}`,
+    ),
+  )
+
   return segments
 }
