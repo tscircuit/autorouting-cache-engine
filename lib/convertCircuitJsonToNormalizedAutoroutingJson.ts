@@ -5,7 +5,9 @@ import type {
   NormalizationOptions,
   NormalizedAutoroutingJson,
   NormalizationTransform,
+  NormalizedObject,
 } from "./types"
+import { getAncestorSubcircuitIds } from "./getAncestorSubcircuitIds"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -16,9 +18,15 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 } => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
   if (options.subcircuitId) {
+    const includedSubcircuitIds = [
+      options.subcircuitId,
+      ...getAncestorSubcircuitIds(circuitJson, options.subcircuitId),
+    ]
+
     circuitJson = circuitJson.filter(
       (el) =>
-        "subcircuit_id" in el && el.subcircuit_id === options.subcircuitId,
+        "subcircuit_id" in el &&
+        includedSubcircuitIds.includes(el.subcircuit_id!),
     )
   }
 
@@ -85,13 +93,22 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     })
 
   // Sort objects by layers, x, y, width, height
-  const sortedObstacles = [...obstacles].sort((a: any, b: any) => {
-    const layerCompare = a.layers.join().localeCompare(b.layers.join())
-    if (layerCompare !== 0) return layerCompare
-    if (a.x !== b.x) return a.x.localeCompare(b.x)
-    if (a.y !== b.y) return a.y.localeCompare(b.y)
-    return (a.width || a.radius || "").localeCompare(b.width || b.radius || "")
-  })
+  const sortedObstacles: NormalizedObject[] = [...obstacles].sort(
+    (a: any, b: any) => {
+      if (a.type !== b.type) return a.type.localeCompare(b.type)
+      if (a.type === "trace" && b.type === "trace") {
+        // TODO trace sorting mechanism
+        return 0
+      }
+      const layerCompare = a.layers.join().localeCompare(b.layers.join())
+      if (layerCompare !== 0) return layerCompare
+      if (a.x !== b.x) return a.x.localeCompare(b.x)
+      if (a.y !== b.y) return a.y.localeCompare(b.y)
+      return (a.width || a.radius || "").localeCompare(
+        b.width || b.radius || "",
+      )
+    },
+  )
 
   // Convert net IDs to numeric indices based on first occurrence in sorted obstacles
   const connNetToNetNumber = new Map<string, number>()
