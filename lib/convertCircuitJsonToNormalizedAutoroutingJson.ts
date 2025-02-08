@@ -8,6 +8,8 @@ import type {
   NormalizedObject,
 } from "./types"
 import { getAncestorSubcircuitIds } from "./circuit-json-utils/getAncestorSubcircuitIds"
+import { getRouteSegmentsFromTrace } from "./circuit-json-utils/getRouteSegmentsFromTrace"
+import { getViasFromTrace } from "./circuit-json-utils/getViasFromTrace"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -31,6 +33,8 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   }
 
   // Get bounds and calculate offsets
+  const regionOfInterest = getBoundsOfRegionOfInterest(circuitJson)
+
   const {
     minX,
     maxX,
@@ -38,7 +42,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     maxY,
     centerX: offsetX,
     centerY: offsetY,
-  } = getBoundsOfRegionOfInterest(circuitJson)
+  } = regionOfInterest
 
   // Collect obstacles with translated positions
   const obstacles = circuitJson
@@ -58,8 +62,14 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
         return {
           net,
           type: "trace" as const,
-          route_segments: getRouteSegmentsFromTrace(el),
-          vias: getViasFromTrace(el),
+          route_segments: getRouteSegmentsFromTrace(el, {
+            offsetX,
+            offsetY,
+          }),
+          vias: getViasFromTrace(el, {
+            offsetX,
+            offsetY,
+          }),
         }
       }
 
@@ -73,7 +83,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
       if (el.type === "pcb_smtpad") {
         return {
           ...base,
-          type: "pad" as const,
+          type: "rect_pad" as const,
           width: (el.shape === "rect" ? el.width : el.radius * 2).toFixed(2),
           height: (el.shape === "rect" ? el.height : el.radius * 2).toFixed(2),
         }
@@ -128,7 +138,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   )
 
   // Convert net IDs to numeric indices based on first occurrence in sorted obstacles
-  const connNetToNetNumber = new Map<string, number>()
+  const connNetToNetNumber = new Map<string | number, number>()
   let netCounter = 1
 
   // Only include nets that are being routed (have traces)

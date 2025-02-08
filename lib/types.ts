@@ -32,7 +32,6 @@ export interface NormalizedPad {
   layers: string[]
   width: string
   height: string
-  radius: string
 }
 
 export interface NormalizedHole {
