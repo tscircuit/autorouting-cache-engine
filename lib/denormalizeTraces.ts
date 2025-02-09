@@ -16,10 +16,12 @@ export const denormalizeTraces = ({
   normalizationTransform,
   circuitJson,
   normalizedTraces,
+  subcircuitId,
 }: {
   normalizationTransform: NormalizationTransform
   circuitJson: CircuitJson
   normalizedTraces: NormalizedAutoroutingTrace[]
+  subcircuitId?: string
 }): PcbTrace[] => {
   const { offsetX: targetOffsetX, offsetY: targetOffsetY } =
     normalizationTransform
@@ -75,7 +77,9 @@ export const denormalizeTraces = ({
     const denormalizedTrace: PcbTrace = {
       type: "pcb_trace",
       source_trace_id: sourceTrace?.source_trace_id,
-      pcb_trace_id: `pcb_trace_${++highestPcbTraceIdNumber}`,
+      pcb_trace_id: `pcb_trace_${++highestPcbTraceIdNumber}${
+        subcircuitId ? `_${subcircuitId}` : ""
+      }`,
       route: denormalizedRoute,
     }
 
