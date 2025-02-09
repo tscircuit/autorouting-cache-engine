@@ -1,5 +1,5 @@
 import type { PcbTrace } from "circuit-json"
-import type { NormalizedTrace } from "../types"
+import type { NormalizedTraceObstacle } from "../types"
 
 export const getViasFromTrace = (
   trace: PcbTrace,
@@ -7,8 +7,8 @@ export const getViasFromTrace = (
     offsetX: number
     offsetY: number
   },
-): NormalizedTrace["vias"] => {
-  const vias: NormalizedTrace["vias"] = []
+): NormalizedTraceObstacle["vias"] => {
+  const vias: NormalizedTraceObstacle["vias"] = []
   for (const point of trace.route) {
     if (point.route_type === "via") {
       vias.push({

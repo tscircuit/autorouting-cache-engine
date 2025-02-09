@@ -45,7 +45,7 @@ export interface NormalizedHole {
   radius: string
 }
 
-export interface NormalizedTrace {
+export interface NormalizedTraceObstacle {
   type: "trace"
   net: number | null
   route_segments: Array<{
@@ -63,7 +63,10 @@ export interface NormalizedTrace {
   }>
 }
 
-export type NormalizedObject = NormalizedPad | NormalizedHole | NormalizedTrace
+export type NormalizedObject =
+  | NormalizedPad
+  | NormalizedHole
+  | NormalizedTraceObstacle
 
 export type NormalizedAutoroutingJson = {
   allowed_layers: number
