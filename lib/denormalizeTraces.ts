@@ -4,10 +4,7 @@ import type {
   PcbTrace,
   PcbTraceRoutePoint,
 } from "circuit-json"
-import type {
-  NormalizationTransform,
-  NormalizedAutoroutingTrace,
-} from "./types"
+import type { NormalizationTransform, NormalizedTrace } from "./types"
 import { LAYER_NAME_TO_NUMBER, LAYER_NUMBER_TO_NAME } from "./constants"
 import { su } from "@tscircuit/soup-util"
 import { addPcbPortIdsToTraces } from "./addPcbPortIdsToTraces"
@@ -19,7 +16,7 @@ export const denormalizeTraces = ({
 }: {
   normalizationTransform: NormalizationTransform
   circuitJson: CircuitJson
-  normalizedTraces: NormalizedAutoroutingTrace[]
+  normalizedTraces: NormalizedTrace[]
 }): PcbTrace[] => {
   const { offsetX: targetOffsetX, offsetY: targetOffsetY } =
     normalizationTransform
