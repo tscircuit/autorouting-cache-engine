@@ -2,7 +2,7 @@ import type { PcbTrace } from "circuit-json"
 import type {
   NormalizationTransform,
   NormalizedObject,
-  NormalizedTrace,
+  NormalizedTraceObstacle,
 } from "../types"
 
 /**
@@ -11,7 +11,7 @@ import type {
 export const getRouteSegmentsFromTrace = (
   trace: PcbTrace,
   normalizationTransform: { offsetX: number; offsetY: number },
-): NormalizedTrace["route_segments"] => {
+): NormalizedTraceObstacle["route_segments"] => {
   const { offsetX, offsetY } = normalizationTransform
   const segments = []
   for (let i = 0; i < trace.route.length - 1; i++) {
