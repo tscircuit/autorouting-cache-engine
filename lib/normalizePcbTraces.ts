@@ -1,11 +1,9 @@
 import type { CircuitJson, PcbTrace } from "circuit-json"
-import type {
-  NormalizationTransform,
-  NormalizedAutoroutingTrace,
-  NormalizedRoutePoint,
-} from "./types"
+import type { NormalizationTransform, NormalizedTrace } from "./types"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { LAYER_NAME_TO_NUMBER } from "./constants"
+import { getRouteSegmentsFromTrace } from "./circuit-json-utils/getRouteSegmentsFromTrace"
+import { getViasFromTrace } from "./circuit-json-utils/getViasFromTrace"
 
 export const normalizePcbTraces = ({
   normalizationTransform,
@@ -15,9 +13,15 @@ export const normalizePcbTraces = ({
   normalizationTransform: NormalizationTransform
   circuitJson: CircuitJson
   pcbTraceIds: string[]
-}): NormalizedAutoroutingTrace[] => {
-  const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
-  const normalizedTraces: NormalizedAutoroutingTrace[] = []
+}): NormalizedTrace[] => {
+  const normalizedTraces: NormalizedTrace[] = []
+
+  const sourceTraceIdToNetMap = new Map<string, number>()
+  for (const [net, info] of Object.entries(normalizationTransform.netInfo)) {
+    for (const sourceTraceId of info.sourceTraceIds) {
+      sourceTraceIdToNetMap.set(sourceTraceId, parseInt(net))
+    }
+  }
 
   for (const pcbTraceId of pcbTraceIds) {
     const pcbTrace = circuitJson.find(
@@ -27,47 +31,24 @@ export const normalizePcbTraces = ({
 
     if (!pcbTrace?.route) continue
 
-    // Get net from connectivity map using source trace ID
     const sourceTraceId = pcbTrace.source_trace_id
     const connNet = sourceTraceId
-      ? connectivityMap.getNetConnectedToId(sourceTraceId)
+      ? (sourceTraceIdToNetMap.get(sourceTraceId) ?? null)
       : undefined
 
-    // Find normalized net number that contains this source trace ID
-    const netEntry = Object.entries(normalizationTransform.netInfo).find(
-      ([_, info]: any) => info.sourceTraceIds.includes(sourceTraceId!),
-    )
-    if (!netEntry) continue
+    if (connNet === null) continue
 
-    const normalizedRoute: NormalizedRoutePoint[] = pcbTrace.route.map(
-      (routePoint) => {
-        const position = {
-          x: routePoint.x - normalizationTransform.offsetX,
-          y: routePoint.y - normalizationTransform.offsetY,
-        }
+    const normalizedPcbTrace: NormalizedTrace = {
+      net: connNet!,
+      type: "trace",
+      route_segments: getRouteSegmentsFromTrace(
+        pcbTrace,
+        normalizationTransform,
+      ),
+      vias: getViasFromTrace(pcbTrace, normalizationTransform),
+    }
 
-        if (routePoint.route_type === "wire") {
-          return {
-            ...position,
-            route_type: "wire" as const,
-            width: routePoint.width,
-            layer: LAYER_NAME_TO_NUMBER[routePoint.layer],
-          }
-        } else {
-          return {
-            ...position,
-            route_type: "via" as const,
-            from_layer: LAYER_NAME_TO_NUMBER[routePoint.from_layer!],
-            to_layer: LAYER_NAME_TO_NUMBER[routePoint.to_layer!],
-          }
-        }
-      },
-    )
-
-    normalizedTraces.push({
-      net: parseInt(netEntry[0]),
-      route: normalizedRoute,
-    })
+    normalizedTraces.push(normalizedPcbTrace)
   }
 
   return normalizedTraces
