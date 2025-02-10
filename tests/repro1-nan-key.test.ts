@@ -8,6 +8,13 @@ test("repro1-nan-key", () => {
     })
 
   expect(cacheKey).toMatchInlineSnapshot(`"f51b182183bfa59a13d3df487f625ec2"`)
+  expect(normalizationTransform).toMatchInlineSnapshot(`
+    {
+      "netInfo": {},
+      "offsetX": 0,
+      "offsetY": 0,
+    }
+  `)
   expect(normalizedAutoroutingJson).toMatchInlineSnapshot(`
     {
       "allowed_layers": 1,
@@ -58,13 +65,6 @@ test("repro1-nan-key", () => {
           "y": "0.00",
         },
       ],
-    }
-  `)
-  expect(normalizationTransform).toMatchInlineSnapshot(`
-    {
-      "netInfo": {},
-      "offsetX": 0,
-      "offsetY": 0,
     }
   `)
 })

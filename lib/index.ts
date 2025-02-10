@@ -1,5 +1,5 @@
 export * from "./convertCircuitJsonToNormalizedAutoroutingJson"
-export * from "./denormalizeTraces"
-export * from "./normalizePcbTraces"
+export * from "./denormalizeTracesAndVias"
+export * from "./normalizeTracesAndVias"
 export * from "./generateCacheKey"
 export * from "./types"
