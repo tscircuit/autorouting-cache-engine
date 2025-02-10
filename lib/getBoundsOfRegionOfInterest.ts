@@ -10,17 +10,12 @@ export const getBoundsOfRegionOfInterest = (
   centerX: number
   centerY: number
 } => {
-  // Collect all trace points from source traces and their connected ports
-  const allPoints = circuitJson
-    .filter((el) => el.type === "source_trace")
-    .flatMap((trace) =>
-      trace.connected_source_port_ids.flatMap((portId) =>
-        circuitJson.filter(
-          (el) => el.type === "pcb_port" && el.source_port_id === portId,
-        ),
-      ),
-    )
-    .map((port: any) => ({ x: port.x, y: port.y }))
+  const allPoints = circuitJson.flatMap((el) => {
+    if (el.type === "pcb_port") {
+      return [{ x: el.x, y: el.y }]
+    }
+    return []
+  })
 
   // Calculate bounds
   const minX = Math.min(...allPoints.map((p) => p.x))
