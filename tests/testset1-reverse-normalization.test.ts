@@ -80,53 +80,53 @@ test("testset1 should be able to apply cached traces to circuit1 and have it mat
 `)
 
   expect(circuit1SpaceTraces).toMatchInlineSnapshot(`
-[
-  {
-    "pcb_trace_id": "pcb_trace_0",
-    "route": [
+    [
       {
-        "layer": "top",
-        "route_type": "wire",
-        "start_pcb_port_id": "pcb_port_0",
-        "width": 0.16,
-        "x": 5.5,
-        "y": 0,
+        "pcb_trace_id": "pcb_trace_0",
+        "route": [
+          {
+            "layer": "top",
+            "route_type": "wire",
+            "start_pcb_port_id": "pcb_port_0",
+            "width": 0.16,
+            "x": 5.5,
+            "y": 0,
+          },
+          {
+            "layer": "top",
+            "route_type": "wire",
+            "width": 0.16,
+            "x": 1.7999999999999998,
+            "y": 0,
+          },
+          {
+            "layer": "top",
+            "route_type": "wire",
+            "width": 0.16,
+            "x": 1.7999999999999998,
+            "y": 1.3,
+          },
+          {
+            "layer": "top",
+            "route_type": "wire",
+            "width": 0.16,
+            "x": -0.5,
+            "y": 1.3,
+          },
+          {
+            "end_pcb_port_id": "pcb_port_2",
+            "layer": "top",
+            "route_type": "wire",
+            "width": 0.16,
+            "x": -0.5,
+            "y": 0,
+          },
+        ],
+        "source_trace_id": "source_trace_0",
+        "type": "pcb_trace",
       },
-      {
-        "layer": "top",
-        "route_type": "wire",
-        "width": 0.16,
-        "x": 1.7999999999999998,
-        "y": 0,
-      },
-      {
-        "layer": "top",
-        "route_type": "wire",
-        "width": 0.16,
-        "x": 1.7999999999999998,
-        "y": 1.3,
-      },
-      {
-        "layer": "top",
-        "route_type": "wire",
-        "width": 0.16,
-        "x": -0.5,
-        "y": 1.3,
-      },
-      {
-        "end_pcb_port_id": "pcb_port_2",
-        "layer": "top",
-        "route_type": "wire",
-        "width": 0.16,
-        "x": -0.5,
-        "y": 0,
-      },
-    ],
-    "source_trace_id": "source_trace_0",
-    "type": "pcb_trace",
-  },
-]
-`)
+    ]
+  `)
 
   expect(circuit1SpaceTraces).toEqual(
     circuit1.filter((el) => el.type === "pcb_trace") as any,
