@@ -12,7 +12,7 @@ import { LAYER_NAME_TO_NUMBER, LAYER_NUMBER_TO_NAME } from "./constants"
 import { su } from "@tscircuit/soup-util"
 import { addPcbPortIdsToTraces } from "./addPcbPortIdsToTraces"
 
-export const denormalizeTraces = ({
+export const denormalizeTracesAndVias = ({
   normalizationTransform,
   circuitJson,
   normalizedTraces,

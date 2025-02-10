@@ -7,7 +7,7 @@ import type {
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { LAYER_NAME_TO_NUMBER } from "./constants"
 
-export const normalizePcbTraces = ({
+export const normalizeTracesAndVias = ({
   normalizationTransform,
   circuitJson,
   pcbTraceIds,

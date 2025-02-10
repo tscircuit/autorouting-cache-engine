@@ -3,8 +3,8 @@ import { test, expect } from "bun:test"
 import circuit1 from "./assets/testset1/circuit1.json"
 import circuit2 from "./assets/testset1/circuit2.json"
 import { convertCircuitJsonToNormalizedAutoroutingJson } from "../lib/convertCircuitJsonToNormalizedAutoroutingJson"
-import { normalizePcbTraces } from "../lib/normalizePcbTraces"
-import { denormalizeTraces } from "../lib/denormalizeTraces"
+import { normalizeTracesAndVias } from "../lib/normalizeTracesAndVias"
+import { denormalizeTracesAndVias } from "../lib/denormalizeTracesAndVias"
 
 test("testset1 should be able to apply cached traces to circuit1 and have it match", () => {
   const cacheRes1 = convertCircuitJsonToNormalizedAutoroutingJson(
@@ -14,7 +14,7 @@ test("testset1 should be able to apply cached traces to circuit1 and have it mat
     circuit2 as any,
   )
 
-  const normalizedTraces = normalizePcbTraces({
+  const normalizedTraces = normalizeTracesAndVias({
     normalizationTransform: cacheRes2.normalizationTransform,
     circuitJson: circuit2 as any,
     pcbTraceIds: circuit2
@@ -22,7 +22,7 @@ test("testset1 should be able to apply cached traces to circuit1 and have it mat
       .map((el) => el.pcb_trace_id!),
   })
 
-  const circuit1SpaceTraces = denormalizeTraces({
+  const circuit1SpaceTraces = denormalizeTracesAndVias({
     normalizationTransform: cacheRes1.normalizationTransform,
     circuitJson: circuit1.filter((el) => el.type !== "pcb_trace") as any,
     normalizedTraces,
