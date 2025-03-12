@@ -187,7 +187,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
       if (netProperties[netNumber]) continue
 
       // Get trace thickness from the element or use default
-      const thickness = el.min_trace_thickness || 0.15
+      const thickness = el.min_trace_thickness ?? 0.15
       netProperties[netNumber] = {
         trace_thickness: thickness,
       }
