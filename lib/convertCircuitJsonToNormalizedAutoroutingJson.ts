@@ -176,14 +176,12 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   ).sort()
 
   const netProperties: Record<number, { trace_thickness: number }> = {}
-  
+
   for (const el of circuitJson) {
     if (el.type === "source_trace") {
-      const connNet = connectivityMap.getNetConnectedToId(
-        el.source_trace_id
-      )
+      const connNet = connectivityMap.getNetConnectedToId(el.source_trace_id)
       const netNumber = connNetToNetNumber.get(connNet!)
-      
+
       if (!netNumber) continue
 
       if (netProperties[netNumber]) continue
@@ -195,7 +193,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
       }
     }
   }
-  
+
   // Ensure all nets have properties
   for (const netNumber of netsToRoute) {
     if (!netProperties[netNumber]) {
