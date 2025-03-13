@@ -90,4 +90,5 @@ export type NormalizationTransform = {
 export interface NormalizationOptions {
   subcircuitId?: string
   marginOutsideOfRegionOfInterest?: number
+  defaultTraceThickness?: string
 }

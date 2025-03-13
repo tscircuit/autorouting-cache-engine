@@ -11,7 +11,7 @@ import type {
   NormalizedObject,
 } from "./types"
 
-const STANDARD_TRACE_THICKNESS = "0.15"
+export const DEFAULT_TRACE_THICKNESS = "0.15"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -20,6 +20,9 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   normalizedAutoroutingJson: NormalizedAutoroutingJson
   normalizationTransform: NormalizationTransform
 } => {
+  const defaultTraceThickness =
+    options.defaultTraceThickness ?? DEFAULT_TRACE_THICKNESS
+
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
   if (options.subcircuitId) {
     const includedSubcircuitIds = [
@@ -190,8 +193,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
 
       // Get trace thickness from the element or use default
       const thickness =
-        el.min_trace_thickness?.toFixed(2).toString() ??
-        STANDARD_TRACE_THICKNESS
+        el.min_trace_thickness?.toFixed(2).toString() ?? defaultTraceThickness
 
       netProperties[netNumber] = {
         trace_thickness: thickness,
@@ -203,7 +205,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   for (const netNumber of netsToRoute) {
     if (!netProperties[netNumber]) {
       netProperties[netNumber] = {
-        trace_thickness: STANDARD_TRACE_THICKNESS,
+        trace_thickness: defaultTraceThickness,
       }
     }
   }
