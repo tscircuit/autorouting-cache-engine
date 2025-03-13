@@ -13,6 +13,11 @@ test("testset1 should be equal despite translation", () => {
   expect(normalizedAutoroutingJson1).toMatchInlineSnapshot(`
     {
       "allowed_layers": 1,
+      "net_properties": {
+        "1": {
+          "trace_thickness": "0.15",
+        },
+      },
       "nets_to_route": [
         1,
       ],

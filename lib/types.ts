@@ -71,6 +71,7 @@ export type NormalizedObject =
 export type NormalizedAutoroutingJson = {
   allowed_layers: number
   nets_to_route: number[]
+  net_properties: Record<number, { trace_thickness: string }>
   sorted_normalized_objects: NormalizedObject[]
 }
 
@@ -89,4 +90,5 @@ export type NormalizationTransform = {
 export interface NormalizationOptions {
   subcircuitId?: string
   marginOutsideOfRegionOfInterest?: number
+  defaultTraceThickness?: string
 }

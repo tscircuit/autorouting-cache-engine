@@ -1,15 +1,17 @@
 import type { CircuitJson } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
-import { getBoundsOfRegionOfInterest } from "./getBoundsOfRegionOfInterest"
-import type {
-  NormalizationOptions,
-  NormalizedAutoroutingJson,
-  NormalizationTransform,
-  NormalizedObject,
-} from "./types"
 import { getAncestorSubcircuitIds } from "./circuit-json-utils/getAncestorSubcircuitIds"
 import { getRouteSegmentsFromTrace } from "./circuit-json-utils/getRouteSegmentsFromTrace"
 import { getViasFromTrace } from "./circuit-json-utils/getViasFromTrace"
+import { getBoundsOfRegionOfInterest } from "./getBoundsOfRegionOfInterest"
+import type {
+  NormalizationOptions,
+  NormalizationTransform,
+  NormalizedAutoroutingJson,
+  NormalizedObject,
+} from "./types"
+
+export const DEFAULT_TRACE_THICKNESS = "0.15"
 
 export const convertCircuitJsonToNormalizedAutoroutingJson = (
   circuitJson: CircuitJson,
@@ -18,6 +20,9 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   normalizedAutoroutingJson: NormalizedAutoroutingJson
   normalizationTransform: NormalizationTransform
 } => {
+  const defaultTraceThickness =
+    options.defaultTraceThickness ?? DEFAULT_TRACE_THICKNESS
+
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
   if (options.subcircuitId) {
     const includedSubcircuitIds = [
@@ -175,9 +180,40 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
     ),
   ).sort()
 
+  const netProperties: Record<number, { trace_thickness: string }> = {}
+
+  for (const el of circuitJson) {
+    if (el.type === "source_trace") {
+      const connNet = connectivityMap.getNetConnectedToId(el.source_trace_id)
+      const netNumber = connNetToNetNumber.get(connNet!)
+
+      if (!netNumber) continue
+
+      if (netProperties[netNumber]) continue
+
+      // Get trace thickness from the element or use default
+      const thickness =
+        el.min_trace_thickness?.toFixed(2).toString() ?? defaultTraceThickness
+
+      netProperties[netNumber] = {
+        trace_thickness: thickness,
+      }
+    }
+  }
+
+  // Ensure all nets have properties
+  for (const netNumber of netsToRoute) {
+    if (!netProperties[netNumber]) {
+      netProperties[netNumber] = {
+        trace_thickness: defaultTraceThickness,
+      }
+    }
+  }
+
   const normalizedAutoroutingJson: NormalizedAutoroutingJson = {
     allowed_layers: 1,
     nets_to_route: netsToRoute,
+    net_properties: netProperties,
     sorted_normalized_objects: normalizedObstacles,
   }
 
