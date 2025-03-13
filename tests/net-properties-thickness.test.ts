@@ -11,13 +11,13 @@ test("Different trace thicknesses should result in different cache keys", () => 
     normalizedAutoroutingJson: normalizedAutoroutingJson2,
   } = generateCacheKey(circuitJsonWithTraceThickness2 as any)
 
-  expect(cacheKey1).toMatchInlineSnapshot(`"8bd5f1de68468eadd235a5b93fb5132b"`)
+  expect(cacheKey1).toMatchInlineSnapshot(`"16cc07390bc734c2249bf1f2d682f1fd"`)
   expect(normalizedAutoroutingJson1).toMatchInlineSnapshot(`
     {
       "allowed_layers": 1,
       "net_properties": {
         "1": {
-          "trace_thickness": 0.3,
+          "trace_thickness": "0.30",
         },
       },
       "nets_to_route": [
@@ -71,14 +71,13 @@ test("Different trace thicknesses should result in different cache keys", () => 
       ],
     }
   `)
-
-  expect(cacheKey2).toMatchInlineSnapshot(`"92b71dd76d9a1b58198f3e14d707ea35"`)
+  expect(cacheKey2).toMatchInlineSnapshot(`"052f0527363a234dd8d0db2185fd3ff1"`)
   expect(normalizedAutoroutingJson2).toMatchInlineSnapshot(`
     {
       "allowed_layers": 1,
       "net_properties": {
         "1": {
-          "trace_thickness": 0.15,
+          "trace_thickness": "0.15",
         },
       },
       "nets_to_route": [

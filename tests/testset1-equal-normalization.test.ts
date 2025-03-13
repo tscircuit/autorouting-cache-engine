@@ -15,7 +15,7 @@ test("testset1 should be equal despite translation", () => {
       "allowed_layers": 1,
       "net_properties": {
         "1": {
-          "trace_thickness": 0.15,
+          "trace_thickness": "0.15",
         },
       },
       "nets_to_route": [
