@@ -3,7 +3,7 @@
 Generate a cache key(s) to enable re-using previous autorouting results.
 
 ```tsx
-import { generateCacheKey, normalizePcbTraces, denormalizeTraces } from "@tscircuit-internal/autorouting-cache-engine"
+import { generateCacheKey, normalizePcbTraces, denormalizeTraces } from "@tscircuit/autorouting-cache-engine"
 import circuitJson from "./circuit.json"
 
 // Generate cache key and get normalization transform
