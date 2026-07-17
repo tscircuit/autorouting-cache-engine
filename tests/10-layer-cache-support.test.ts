@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test"
 import type { CircuitJson, PcbTrace } from "circuit-json"
+import { findPcbPortForRoutePoint } from "../lib/addPcbPortIdsToTraces"
 import { LAYER_NAME_TO_NUMBER, LAYER_NUMBER_TO_NAME } from "../lib/constants"
 import { convertCircuitJsonToNormalizedAutoroutingJson } from "../lib/convertCircuitJsonToNormalizedAutoroutingJson"
 import { denormalizeTraces } from "../lib/denormalizeTraces"
@@ -122,4 +123,23 @@ test("layer count is included in the cache key", () => {
   expect(twoLayerResult.normalizedAutoroutingJson.allowed_layers).toBe(2)
   expect(tenLayerResult.normalizedAutoroutingJson.allowed_layers).toBe(10)
   expect(twoLayerResult.cacheKey).not.toBe(tenLayerResult.cacheKey)
+})
+
+test("through-pad endpoints can be matched to PCB ports", () => {
+  const circuitJson = makeCircuitWithLayerCount(10)
+  const throughPad = {
+    route_type: "through_pad" as const,
+    start: { x: 5.5, y: 0 },
+    end: { x: -0.5, y: 0 },
+    width: 0.16,
+    start_layer: "inner7" as const,
+    end_layer: "inner8" as const,
+  }
+
+  expect(findPcbPortForRoutePoint(circuitJson, throughPad, "start")).toBe(
+    "pcb_port_0",
+  )
+  expect(findPcbPortForRoutePoint(circuitJson, throughPad, "end")).toBe(
+    "pcb_port_2",
+  )
 })
