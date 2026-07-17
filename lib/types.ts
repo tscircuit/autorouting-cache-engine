@@ -1,12 +1,32 @@
-export interface NormalizedRoutePoint {
-  route_type: "wire" | "via"
+export interface NormalizedRoutePointWire {
+  route_type: "wire"
   x: number
   y: number
-  width?: number
-  from_layer?: number
-  to_layer?: number
-  layer?: number
+  width: number
+  layer: number
 }
+
+export interface NormalizedRoutePointVia {
+  route_type: "via"
+  x: number
+  y: number
+  from_layer: number
+  to_layer: number
+}
+
+export interface NormalizedRoutePointThroughPad {
+  route_type: "through_pad"
+  start: { x: number; y: number }
+  end: { x: number; y: number }
+  width: number
+  start_layer: number
+  end_layer: number
+}
+
+export type NormalizedRoutePoint =
+  | NormalizedRoutePointWire
+  | NormalizedRoutePointVia
+  | NormalizedRoutePointThroughPad
 
 /**
  * Normalized-space traces are traces that have been transformed to the

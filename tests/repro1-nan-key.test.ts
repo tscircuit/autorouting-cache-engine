@@ -7,10 +7,10 @@ test("repro1-nan-key", () => {
       subcircuitId: "subcircuit_source_group_0",
     })
 
-  expect(cacheKey).toMatchInlineSnapshot(`"55631b6c19d07b00d2be40753be917e1"`)
+  expect(cacheKey).toMatchInlineSnapshot(`"a09528aaf7a40c1449688dbc9db0b204"`)
   expect(normalizedAutoroutingJson).toMatchInlineSnapshot(`
     {
-      "allowed_layers": 1,
+      "allowed_layers": 4,
       "net_properties": {},
       "nets_to_route": [],
       "sorted_normalized_objects": [
