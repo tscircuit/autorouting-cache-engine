@@ -23,6 +23,12 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   const defaultTraceThickness =
     options.defaultTraceThickness ?? DEFAULT_TRACE_THICKNESS
 
+  // Layer count affects which routes are valid, so it must be part of the
+  // normalized autorouting JSON (and therefore the cache key). Read it before
+  // filtering to a subcircuit because pcb_board is not subcircuit-scoped.
+  const allowedLayers =
+    circuitJson.find((el) => el.type === "pcb_board")?.num_layers ?? 1
+
   const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
   if (options.subcircuitId) {
     const includedSubcircuitIds = [
@@ -211,7 +217,7 @@ export const convertCircuitJsonToNormalizedAutoroutingJson = (
   }
 
   const normalizedAutoroutingJson: NormalizedAutoroutingJson = {
-    allowed_layers: 1,
+    allowed_layers: allowedLayers,
     nets_to_route: netsToRoute,
     net_properties: netProperties,
     sorted_normalized_objects: normalizedObstacles,

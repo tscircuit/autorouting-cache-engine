@@ -41,6 +41,23 @@ export const normalizePcbTraces = ({
 
     const normalizedRoute: NormalizedRoutePoint[] = pcbTrace.route.map(
       (routePoint) => {
+        if (routePoint.route_type === "through_pad") {
+          return {
+            route_type: "through_pad" as const,
+            start: {
+              x: routePoint.start.x - normalizationTransform.offsetX,
+              y: routePoint.start.y - normalizationTransform.offsetY,
+            },
+            end: {
+              x: routePoint.end.x - normalizationTransform.offsetX,
+              y: routePoint.end.y - normalizationTransform.offsetY,
+            },
+            width: routePoint.width,
+            start_layer: LAYER_NAME_TO_NUMBER[routePoint.start_layer],
+            end_layer: LAYER_NAME_TO_NUMBER[routePoint.end_layer],
+          }
+        }
+
         const position = {
           x: routePoint.x - normalizationTransform.offsetX,
           y: routePoint.y - normalizationTransform.offsetY,
@@ -53,13 +70,13 @@ export const normalizePcbTraces = ({
             width: routePoint.width,
             layer: LAYER_NAME_TO_NUMBER[routePoint.layer],
           }
-        } else {
-          return {
-            ...position,
-            route_type: "via" as const,
-            from_layer: LAYER_NAME_TO_NUMBER[routePoint.from_layer!],
-            to_layer: LAYER_NAME_TO_NUMBER[routePoint.to_layer!],
-          }
+        }
+
+        return {
+          ...position,
+          route_type: "via" as const,
+          from_layer: LAYER_NAME_TO_NUMBER[routePoint.from_layer],
+          to_layer: LAYER_NAME_TO_NUMBER[routePoint.to_layer],
         }
       },
     )

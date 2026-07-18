@@ -8,7 +8,7 @@ import type {
   NormalizationTransform,
   NormalizedAutoroutingTrace,
 } from "./types"
-import { LAYER_NAME_TO_NUMBER, LAYER_NUMBER_TO_NAME } from "./constants"
+import { LAYER_NUMBER_TO_NAME } from "./constants"
 import { su } from "@tscircuit/soup-util"
 import { addPcbPortIdsToTraces } from "./addPcbPortIdsToTraces"
 
@@ -48,6 +48,24 @@ export const denormalizeTraces = ({
     const denormalizedRoute: PcbTraceRoutePoint[] = []
 
     for (const normalizedRoutePoint of normalizedTrace.route) {
+      if (normalizedRoutePoint.route_type === "through_pad") {
+        denormalizedRoute.push({
+          route_type: "through_pad",
+          start: {
+            x: normalizedRoutePoint.start.x + normalizationTransform.offsetX,
+            y: normalizedRoutePoint.start.y + normalizationTransform.offsetY,
+          },
+          end: {
+            x: normalizedRoutePoint.end.x + normalizationTransform.offsetX,
+            y: normalizedRoutePoint.end.y + normalizationTransform.offsetY,
+          },
+          width: normalizedRoutePoint.width,
+          start_layer: LAYER_NUMBER_TO_NAME[normalizedRoutePoint.start_layer]!,
+          end_layer: LAYER_NUMBER_TO_NAME[normalizedRoutePoint.end_layer]!,
+        })
+        continue
+      }
+
       const denormalizedPosition = {
         x: normalizedRoutePoint.x + normalizationTransform.offsetX,
         y: normalizedRoutePoint.y + normalizationTransform.offsetY,
@@ -55,8 +73,8 @@ export const denormalizeTraces = ({
 
       if (normalizedRoutePoint.route_type === "via") {
         const from_layer =
-          LAYER_NUMBER_TO_NAME[normalizedRoutePoint.from_layer!]!
-        const to_layer = LAYER_NUMBER_TO_NAME[normalizedRoutePoint.to_layer!]!
+          LAYER_NUMBER_TO_NAME[normalizedRoutePoint.from_layer]!
+        const to_layer = LAYER_NUMBER_TO_NAME[normalizedRoutePoint.to_layer]!
 
         denormalizedRoute.push({
           ...denormalizedPosition,
@@ -68,8 +86,8 @@ export const denormalizeTraces = ({
         denormalizedRoute.push({
           ...denormalizedPosition,
           route_type: "wire",
-          layer: LAYER_NUMBER_TO_NAME[normalizedRoutePoint.layer!] as LayerRef,
-          width: normalizedRoutePoint.width!,
+          layer: LAYER_NUMBER_TO_NAME[normalizedRoutePoint.layer] as LayerRef,
+          width: normalizedRoutePoint.width,
         })
       }
     }
